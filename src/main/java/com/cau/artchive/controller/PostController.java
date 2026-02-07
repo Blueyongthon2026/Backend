@@ -28,7 +28,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ApiResponse<PostDetailResponseDto> getPostDetail(@PathVariable Long postId) {
+    public ApiResponse<PostResponseDto> getPostDetail(@PathVariable Long postId) {
         return ApiResponse.success(postService.getPostDetail(postId), "POST_DETAIL_SUCCESS");
     }
 
@@ -44,8 +44,8 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public ApiResponse<Void> deletePost(@PathVariable Long postId) {
+    public ApiResponse<Long> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
-        return ApiResponse.success(null, "POST_DELETE_SUCCESS");
+        return ApiResponse.success(postId, "POST_DELETE_SUCCESS");
     }
 }
