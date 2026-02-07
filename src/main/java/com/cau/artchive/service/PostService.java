@@ -75,12 +75,16 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(Long postId, PostRequestDto dto) {
-        Post post = postRepository.findById(postId).orElseThrow();
-        // 더티 체킹(Dirty Checking)으로 자동 업데이트
+    public Long updatePost(Long postId, PostRequestDto dto) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("POST_NOT_FOUND"));
+
+        // 더티 체킹을 통한 데이터 수정
         post.update(dto.getTitle(), dto.getContent(), dto.getCategory(),
                 dto.getWorkName(), dto.getLocation(), dto.getRating(),
                 dto.getViewingDate(), dto.isOpen());
+
+        return post.getPostId();
     }
 
     @Transactional
@@ -97,6 +101,10 @@ public class PostService {
     }
 
     private PostResponseDto convertToDto(Post post) {
+
+        // TODO 본인정보 받아오면 좋아요 여부 확인
+//        boolean isLiked = likeRepository.existsByUserAndPost(currentUser, post);
+
         return PostResponseDto.builder()
                 .postId(post.getPostId())
                 .authorUserId(post.getUser().getUserId())

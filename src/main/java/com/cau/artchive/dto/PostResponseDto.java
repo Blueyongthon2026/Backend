@@ -27,5 +27,9 @@ public class PostResponseDto {
     private int likeCount;
     @JsonProperty("isPublic")
     private boolean open;
+    //TODO사용자가 이 글을 좋아요 눌렀는지 여부
+//    @JsonProperty("isLiked")
+//    private boolean liked;
+
     private LocalDateTime createdAt;
 }
