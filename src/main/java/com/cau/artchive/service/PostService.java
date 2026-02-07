@@ -12,14 +12,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PostService {
-
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public Long createPost(User user, PostRequestDto dto) {
@@ -75,6 +77,39 @@ public class PostService {
             throw new RuntimeException("FORBIDDEN");
         }
         postRepository.delete(post);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> getAllPublicPosts() {
+        // isPublic이 true인 것들을 createdAt 내림차순으로 조회
+        return postRepository.findAllByOpenOrderByCreatedAtDesc(true).stream()
+                .map(this::toDto) // 목록에선 isLiked 처리가 필요하면 유저 정보 전달
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> getUserPublicPosts(String userId) {
+        User user = userRepository.findByUserId(userId).orElseThrow();
+        return postRepository.findAllByUserAndOpenOrderByCreatedAtDesc(user, true).stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> getMyShelf(String userId) {
+        User user = userRepository.findByUserId(userId).orElseThrow();
+        // 내 책장은 공개 여부 상관없이 전체 조회
+        return postRepository.findAllByUserOrderByCreatedAtDesc(user).stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> getMyPostsByDate(String userId, LocalDate date) {
+        User user = userRepository.findByUserId(userId).orElseThrow();
+        return postRepository.findAllByUserAndViewingDateOrderByCreatedAtDesc(user, date).stream()
+                .map(this::toDto)
+                .toList();
     }
 
     private PostResponseDto toDto(Post post) {
