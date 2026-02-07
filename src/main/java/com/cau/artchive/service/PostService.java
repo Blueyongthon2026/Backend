@@ -23,12 +23,12 @@ public class PostService {
 
     @Transactional
     public Long createPost(PostRequestDto dto) {
-        // 1. "adminid" 유저 조회 (로그인 대신 고정값 사용)
+        // 1. "adminid" 유저 조회 (로그인 대신 고정값 사용) //TODO jwt
         User adminUser = userRepository.findByUserId("adminid")
                 .orElseThrow(() -> new IllegalStateException("관리자 계정이 생성되지 않았습니다."));
 
         // 2. 요청하신 고정 이미지 URL 사용
-        String fixedImageUrl = "https://ibb.co/B512v7xL";
+        String fixedImageUrl = "https://ibb.co/B512v7xL"; //TODO S3
 
         // 3. 게시글 저장
         Post post = Post.builder()
