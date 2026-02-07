@@ -1,0 +1,6 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+        format_sql: true # 쿼리가 어떻게 묶여 나가는지 로그로 확인 가능
