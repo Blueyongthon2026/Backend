@@ -6,7 +6,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
-public class S3PresignerConfig {
+public class S3PresignConfig {
 
     @Bean
     public S3Presigner s3Presigner() {

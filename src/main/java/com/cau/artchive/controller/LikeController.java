@@ -1,7 +1,10 @@
 package com.cau.artchive.controller;
 
+import com.cau.artchive.entity.User;
 import com.cau.artchive.global.response.ApiResponse;
+import com.cau.artchive.jwt.AuthUtils;
 import com.cau.artchive.service.LikeService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,15 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/likes")
 @RequiredArgsConstructor
 public class LikeController {
+
     private final LikeService likeService;
 
     @PostMapping("/{postId}")
-    public ApiResponse<Integer> toggleLike(@PathVariable Long postId) {
-        boolean isLiked = likeService.toggleLike(postId);
-
-        // true면 1, false면 0으로 변환해서 반환 (또는 boolean 그대로 반환해도 무방함)
-        int result = isLiked ? 1 : 0;
-
-        return ApiResponse.success(result, "LIKE_TOGGLE_SUCCESS");
+    public ApiResponse<Integer> toggleLike(
+            @PathVariable Long postId,
+            HttpServletRequest request
+    ) {
+        User user = AuthUtils.getUser(request);
+        boolean liked = likeService.toggleLike(user, postId);
+        return ApiResponse.success(liked ? 1 : 0, "LIKE_TOGGLE_SUCCESS");
     }
 }
