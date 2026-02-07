@@ -1,6 +1,18 @@
 spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
   jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
+        format_sql: true
         default_batch_fetch_size: 100
-        format_sql: true # 쿼리가 어떻게 묶여 나가는지 로그로 확인 가능
+    open-in-view: false

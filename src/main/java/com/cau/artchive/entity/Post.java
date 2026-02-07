@@ -25,9 +25,11 @@ public class Post extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
     private String location;
-    @Column(precision = 2, scale = 1)
+
     private Double rating;
     private LocalDate viewingDate;
+
+    private int likeCount = 0;
 
     @Builder
     public Post(User user, String coverImage, Category category, String workName, String title, String content, String location, Double rating, LocalDate viewingDate) {
@@ -40,5 +42,11 @@ public class Post extends BaseTimeEntity {
         this.location = location;
         this.rating = rating;
         this.viewingDate = viewingDate;
+    }
+
+    // 좋아요 수 증감 메서드 (나중에 LikeService에서 호출)
+    public void updateLikeCount(boolean increment) {
+        if (increment) this.likeCount++;
+        else if (this.likeCount > 0) this.likeCount--;
     }
 }
