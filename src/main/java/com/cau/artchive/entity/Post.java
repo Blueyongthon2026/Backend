@@ -60,4 +60,16 @@ public class Post extends BaseTimeEntity {
         if (increment) this.likeCount++;
         else if (this.likeCount > 0) this.likeCount--;
     }
+
+    public void update(String title, String content, Category category, String workName,
+                       String location, Double rating, LocalDate viewingDate, boolean isPublic) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.workName = workName;
+        this.location = location;
+        this.rating = rating;
+        this.viewingDate = viewingDate;
+        this.open = isPublic;
+    }
 }

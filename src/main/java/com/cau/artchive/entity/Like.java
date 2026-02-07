@@ -2,6 +2,7 @@ package com.cau.artchive.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +23,10 @@ public class Like {
     @JoinColumn(name = "post_id")
     private Post post;
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder
+    public Like(User user, Post post) {
+        this.user = user;
+        this.post = post;
+    }
 }

@@ -1,5 +1,6 @@
 package com.cau.artchive.controller;
 
+import com.cau.artchive.dto.PostDetailResponseDto;
 import com.cau.artchive.dto.PostRequestDto;
 import com.cau.artchive.dto.PostResponseDto;
 import com.cau.artchive.service.PostService;
@@ -25,5 +26,27 @@ public class PostController {
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDetailResponseDto> getPostDetail(@PathVariable Long postId) {
+        return ResponseEntity.ok(postService.getPostDetail(postId));
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<Void> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto dto) {
+        postService.updatePost(postId, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PostResponseDto>> searchPosts(@RequestParam String keyword) {
+        return ResponseEntity.ok(postService.searchPosts(keyword));
     }
 }

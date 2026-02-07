@@ -24,6 +24,8 @@ public class PostService {
 
     @Transactional
     public Long createPost(PostRequestDto dto) {
+        // TODO: 하드코딩된 "adminid" 제거.
+        // SecurityContextHolder.getContext().getAuthentication().getName() 등을 활용하여 토큰에서 유저 ID 추출 필요.
         User adminUser = userRepository.findByUserId("adminid") //TODO jwt
                 .orElseThrow(() -> new IllegalStateException("관리자 계정이 없습니다."));
 
@@ -70,6 +72,28 @@ public class PostService {
                 .collect(Collectors.toList());
 
         return new PostDetailResponseDto(postDto, commentDtos);
+    }
+
+    @Transactional
+    public void updatePost(Long postId, PostRequestDto dto) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        // 더티 체킹(Dirty Checking)으로 자동 업데이트
+        post.update(dto.getTitle(), dto.getContent(), dto.getCategory(),
+                dto.getWorkName(), dto.getLocation(), dto.getRating(),
+                dto.getViewingDate(), dto.isOpen());
+    }
+
+    @Transactional
+    public void deletePost(Long postId) {
+        postRepository.deleteById(postId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> searchPosts(String keyword) {
+        return postRepository.findByWorkNameContainingIgnoreCaseOrTitleContainingIgnoreCase(keyword, keyword)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     private PostResponseDto convertToDto(Post post) {
