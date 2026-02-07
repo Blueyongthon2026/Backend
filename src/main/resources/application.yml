@@ -2,10 +2,12 @@ spring:
   config:
     import: optional:application-secret.yml
   profiles:
-    active: local #TODO 나중에 deployment로 바꾸기
+    active: deployment #TODO 나중에 deployment로 바꾸기
+
   jpa:
     hibernate:
       ddl-auto: update
+      dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
     open-in-view: false
     properties:
@@ -17,9 +19,9 @@ cloud:
     region:
       static: ap-northeast-2
 
-# Swagger UI 경로: http://localhost:8080/swagger-ui.html
-springdoc:
-  default-consume-media-type: application/json
-  default-produce-media-type: application/json
-  # Pageable 관련 오류 방지
-  show-actuator: true
+## Swagger UI 경로: http://localhost:8080/swagger-ui.html
+#springdoc:
+#  default-consume-media-type: application/json
+#  default-produce-media-type: application/json
+#  # Pageable 관련 오류 방지
+#  show-actuator: true
