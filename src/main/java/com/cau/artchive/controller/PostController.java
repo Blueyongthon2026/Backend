@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/posts") // 버전 관리 관례에 따라 v1 추가
+@RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class PostController {
 
