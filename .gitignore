@@ -41,5 +41,6 @@ out/
 *.trace.db
 
 application-secret.yml
+application-local.yml
 
 *.pem
