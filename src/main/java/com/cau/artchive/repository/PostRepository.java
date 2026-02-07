@@ -1,9 +1,11 @@
 package com.cau.artchive.repository;
 
 import com.cau.artchive.entity.Post;
+import com.cau.artchive.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -13,5 +15,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 작품명 또는 제목에 키워드가 포함된 게시글 찾기 (대소문자 무시)
     List<Post> findByWorkNameContainingIgnoreCaseOrTitleContainingIgnoreCase(String workKeyword, String titleKeyword);
 
+    List<Post> findAllByOpenOrderByCreatedAtDesc(boolean open);
+    List<Post> findAllByUserAndOpenOrderByCreatedAtDesc(User user, boolean open);
+    List<Post> findAllByUserOrderByCreatedAtDesc(User user);
+    List<Post> findAllByUserAndViewingDateOrderByCreatedAtDesc(User user, LocalDate viewingDate);
 
 }
