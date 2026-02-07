@@ -1,13 +1,13 @@
 package com.cau.artchive.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor // Builder 사용을 위해 필요
+@Builder
 public class Comment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,4 +19,8 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "user_dbid")
     private User user;
     private String content;
+
+    public void update(String content) {
+        this.content = content;
+    }
 }

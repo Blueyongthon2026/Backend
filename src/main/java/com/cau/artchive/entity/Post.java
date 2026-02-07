@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,8 +33,16 @@ public class Post extends BaseTimeEntity {
 
     private int likeCount = 0;
 
+    @Column(name = "is_public")
+    private boolean open;
+
+    // 추가: 댓글 연관관계 (getComments() 메서드를 가능하게 함)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Comment> comments = new ArrayList<>();
+
     @Builder
-    public Post(User user, String coverImage, Category category, String workName, String title, String content, String location, Double rating, LocalDate viewingDate) {
+    public Post(User user, String coverImage, Category category, String workName, String title,
+                String content, String location, Double rating, LocalDate viewingDate, boolean isPublic) {
         this.user = user;
         this.coverImage = coverImage;
         this.category = category;
@@ -42,11 +52,24 @@ public class Post extends BaseTimeEntity {
         this.location = location;
         this.rating = rating;
         this.viewingDate = viewingDate;
+        this.open = isPublic; // 빌더에서 전달받은 값을 open 필드에 할당
     }
 
     // 좋아요 수 증감 메서드 (나중에 LikeService에서 호출)
     public void updateLikeCount(boolean increment) {
         if (increment) this.likeCount++;
         else if (this.likeCount > 0) this.likeCount--;
+    }
+
+    public void update(String title, String content, Category category, String workName,
+                       String location, Double rating, LocalDate viewingDate, boolean isPublic) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.workName = workName;
+        this.location = location;
+        this.rating = rating;
+        this.viewingDate = viewingDate;
+        this.open = isPublic;
     }
 }
