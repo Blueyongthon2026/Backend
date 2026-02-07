@@ -1,5 +1,7 @@
 package com.cau.artchive.service;
 
+import com.cau.artchive.dto.CommentResponseDto;
+import com.cau.artchive.dto.PostDetailResponseDto;
 import com.cau.artchive.dto.PostRequestDto;
 import com.cau.artchive.dto.PostResponseDto;
 import com.cau.artchive.entity.Post;
@@ -17,23 +19,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PostService {
-
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public Long createPost(PostRequestDto dto) {
-        // 1. "adminid" 유저 조회 (로그인 대신 고정값 사용) //TODO jwt
-        User adminUser = userRepository.findByUserId("adminid")
-                .orElseThrow(() -> new IllegalStateException("관리자 계정이 생성되지 않았습니다."));
+        User adminUser = userRepository.findByUserId("adminid") //TODO jwt
+                .orElseThrow(() -> new IllegalStateException("관리자 계정이 없습니다."));
 
-        // 2. 요청하신 고정 이미지 URL 사용
-        String fixedImageUrl = "https://ibb.co/B512v7xL"; //TODO S3
-
-        // 3. 게시글 저장
         Post post = Post.builder()
                 .user(adminUser)
-                .coverImage(fixedImageUrl)
+                .coverImage("https://ibb.co/B512v7xL") //TODO Jwt
                 .category(dto.getCategory())
                 .workName(dto.getWorkName())
                 .title(dto.getTitle())
@@ -41,21 +37,57 @@ public class PostService {
                 .location(dto.getLocation())
                 .rating(dto.getRating())
                 .viewingDate(dto.getViewingDate())
+                .isPublic(dto.isOpen()) // 추가
                 .build();
 
         return postRepository.save(post).getPostId();
     }
 
-    // 목록 조회 시 likeCount도 포함하도록 DTO 변환 로직 확인
     public List<PostResponseDto> getAllPosts() {
+        // N+1 방지를 위해 fetch join된 쿼리 사용
         return postRepository.findAllWithUser().stream()
-                .map(post -> PostResponseDto.builder()
-                        .postId(post.getPostId())
-                        .authorNickname(post.getUser().getNickname())
-                        .title(post.getTitle())
-                        .likeCount(post.getLikeCount()) // 추가됨
-                        .coverImage(post.getCoverImage())
-                        .build())
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    public PostDetailResponseDto getPostDetail(Long postId) {
+        // 1. 게시글 조회 (N+1 방지를 위해 fetch join 처리된 쿼리 권장)
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+
+        // 2. 게시글 DTO 변환
+        PostResponseDto postDto = convertToDto(post);
+
+        // 3. 댓글 목록 조회 및 변환 (batch_fetch_size 설정 덕분에 쿼리 효율적)
+        List<CommentResponseDto> commentDtos = post.getComments().stream()
+                .map(c -> new CommentResponseDto(
+                        c.getCommentId(),
+                        c.getUser().getUserId(),
+                        c.getUser().getNickname(),
+                        c.getContent(),
+                        c.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+
+        return new PostDetailResponseDto(postDto, commentDtos);
+    }
+
+    private PostResponseDto convertToDto(Post post) {
+        return PostResponseDto.builder()
+                .postId(post.getPostId())
+                .authorUserId(post.getUser().getUserId())
+                .authorNickname(post.getUser().getNickname())
+                .coverImage(post.getCoverImage())
+                .category(post.getCategory())
+                .workName(post.getWorkName())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .location(post.getLocation())
+                .rating(post.getRating())
+                .viewingDate(post.getViewingDate())
+                .likeCount(post.getLikeCount())
+                .open(post.isOpen())
+                .createdAt(post.getCreatedAt())
+                .build();
     }
 }
