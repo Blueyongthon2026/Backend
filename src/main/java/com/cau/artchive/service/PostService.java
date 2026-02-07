@@ -31,7 +31,7 @@ public class PostService {
 
         Post post = Post.builder()
                 .user(adminUser)
-                .coverImage("https://ibb.co/B512v7xL") //TODO Jwt
+                .coverImage(dto.getCoverImageUrl()) //TODO Jwt
                 .category(dto.getCategory())
                 .workName(dto.getWorkName())
                 .title(dto.getTitle())

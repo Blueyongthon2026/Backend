@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Setter
 public class PostRequestDto {
     private String title, content, workName, location;
+    private String coverImageUrl; // presigned !
     private Category category;
     private Double rating;
     private LocalDate viewingDate;
