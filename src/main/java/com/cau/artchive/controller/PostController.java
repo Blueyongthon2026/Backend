@@ -38,9 +38,9 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public ApiResponse<Void> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto dto) {
-        postService.updatePost(postId, dto);
-        return ApiResponse.success(null, "POST_UPDATE_SUCCESS");
+    public ApiResponse<Long> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto dto) {
+        Long updatedPostId = postService.updatePost(postId, dto);
+        return ApiResponse.success(updatedPostId, "POST_UPDATE_SUCCESS");
     }
 
     @DeleteMapping("/{postId}")
