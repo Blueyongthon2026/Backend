@@ -52,26 +52,31 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public PostDetailResponseDto getPostDetail(Long postId) {
-        // 1. 게시글 조회 (N+1 방지를 위해 fetch join 처리된 쿼리 권장)
+    public PostResponseDto getPostDetail(Long postId) {
+
+        // TODO: JWT 도입 시 SecurityContextHolder에서 현재 로그인 유저 정보를 가져옴
+        User currentUser = userRepository.findByUserId("adminid")
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new RuntimeException("POST_NOT_FOUND"));
 
         // 2. 게시글 DTO 변환
-        PostResponseDto postDto = convertToDto(post);
+        return convertToDto(post);
 
-        // 3. 댓글 목록 조회 및 변환 (batch_fetch_size 설정 덕분에 쿼리 효율적)
-        List<CommentResponseDto> commentDtos = post.getComments().stream()
-                .map(c -> new CommentResponseDto(
-                        c.getCommentId(),
-                        c.getUser().getUserId(),
-                        c.getUser().getNickname(),
-                        c.getContent(),
-                        c.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
+//        // 3. 댓글 목록 조회 및 변환
+//        List<CommentResponseDto> commentDtos = post.getComments().stream()
+//                .map(c -> new CommentResponseDto(
+//                        c.getCommentId(),
+//                        c.getUser().getUserId(),
+//                        c.getUser().getNickname(),
+//                        c.getContent(),
+//                        c.getCreatedAt()
+//                ))
+//                .collect(Collectors.toList());
 
-        return new PostDetailResponseDto(postDto, commentDtos);
+//        return new PostDetailResponseDto(postDto, commentDtos);
+
     }
 
     @Transactional
