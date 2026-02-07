@@ -1,5 +1,6 @@
 package com.cau.artchive.controller;
 
+import com.cau.artchive.global.response.ApiResponse;
 import com.cau.artchive.service.FollowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,15 +10,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/follow")
+@RequestMapping("/api/v1/follow")
 @RequiredArgsConstructor
 public class FollowController {
     private final FollowService followService;
 
-    // POST /api/follow/user2 형태 호출
+    // POST /api/v1/follow/user2 형태 호출
     @PostMapping("/{toUserId}")
-    public ResponseEntity<String> toggleFollow(@PathVariable String toUserId) {
-        followService.toggleFollow(toUserId);
-        return ResponseEntity.ok("팔로우 상태가 변경되었습니다.");
+    public ApiResponse<Integer> toggleFollow(@PathVariable String toUserId) {
+        boolean isFollowing = followService.toggleFollow(toUserId);
+
+        // true면 1(팔로잉 중), false면 0(팔로우 안 함)
+        int result = isFollowing ? 1 : 0;
+
+        return ApiResponse.success(result, "FOLLOW_TOGGLE_SUCCESS");
     }
 }

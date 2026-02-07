@@ -19,17 +19,21 @@ public class LikeService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void toggleLike(Long postId) {
-        // TODO: JWT 토큰의 유저 정보로 대체 필요
+    public boolean toggleLike(Long postId) {
+        // TODO: JWT 도입 시 SecurityContext에서 내 정보를 가져와야 함
         User user = userRepository.findByUserId("adminid").orElseThrow();
         Post post = postRepository.findById(postId).orElseThrow();
 
         if (likeRepository.existsByUserAndPost(user, post)) {
-            likeRepository.deleteByUserAndPost(user, post); // 직접 삭제 메서드 활용
+            // 이미 있다면 삭제 (좋아요 취소)
+            likeRepository.deleteByUserAndPost(user, post);
             post.updateLikeCount(false);
+            return false; // 현재 상태: 좋아요 아님 (0)
         } else {
+            // 없다면 생성 (좋아요 등록)
             likeRepository.save(Like.builder().user(user).post(post).build());
             post.updateLikeCount(true);
+            return true; // 현재 상태: 좋아요 중 (1)
         }
     }
 }

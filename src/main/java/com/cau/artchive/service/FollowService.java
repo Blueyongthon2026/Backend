@@ -18,29 +18,30 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
 
-    public void toggleFollow(String toUserId) {
-        // TODO: 현재는 "adminid"로 하드코딩. 나중에 JWT 토큰에서 추출한 내 ID를 사용해야 함.
+    @Transactional
+    public boolean toggleFollow(String toUserId) {
+        // TODO: 현재는 "adminid" 고정, 추후 JWT 토큰 정보로 교체
         User me = userRepository.findByUserId("adminid")
-                .orElseThrow(() -> new RuntimeException("내 계정을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+        User target = userRepository.findByUserId(toUserId)
+                .orElseThrow(() -> new RuntimeException("TARGET_USER_NOT_FOUND"));
 
-        // 내가 팔로우하려는 상대방
-        User targetUser = userRepository.findByUserId(toUserId)
-                .orElseThrow(() -> new RuntimeException("팔로우할 대상을 찾을 수 없습니다."));
-
-        if (me.getUserId().equals(targetUser.getUserId())) {
-            throw new RuntimeException("자기 자신은 팔로우할 수 없습니다.");
+        if (me.getUserId().equals(target.getUserId())) {
+            throw new RuntimeException("SELF_FOLLOW_NOT_ALLOWED");
         }
 
-        if (followRepository.existsByFromUserAndToUser(me, targetUser)) {
-            // 이미 팔로우 중이면 취소 (언팔로우)
-            followRepository.deleteByFromUserAndToUser(me, targetUser);
+        if (followRepository.existsByFromUserAndToUser(me, target)) {
+            // 이미 팔로우 중이면 삭제 (언팔로우)
+            followRepository.deleteByFromUserAndToUser(me, target);
+            return false; // 현재 상태: 팔로우 아님 (0)
         } else {
             // 팔로우 신청
             followRepository.save(Follow.builder()
                     .fromUser(me)
-                    .toUser(targetUser)
+                    .toUser(target)
                     .createdAt(LocalDateTime.now())
                     .build());
+            return true; // 현재 상태: 팔로우 중 (1)
         }
     }
 }
