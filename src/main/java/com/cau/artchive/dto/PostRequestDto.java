@@ -1,6 +1,7 @@
 package com.cau.artchive.dto;
 
 import com.cau.artchive.entity.Category;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +14,6 @@ public class PostRequestDto {
     private Category category;
     private Double rating;
     private LocalDate viewingDate;
+    @JsonProperty("isPublic")
+    private boolean open; //
 }
