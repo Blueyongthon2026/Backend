@@ -8,3 +8,5 @@ spring:
     username: root
     password: 081203
     driver-class-name: com.mysql.cj.jdbc.Driver
+jwt:
+  secret: my-secret-key-my-secret-key-my-secret-key
